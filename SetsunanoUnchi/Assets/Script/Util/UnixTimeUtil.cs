@@ -1,0 +1,10 @@
+using System;
+
+public static class UnixTimeUtil
+{
+    public static int GetCurrentUnixTime()
+    {
+        var unixTimestamp = (int) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        return unixTimestamp;
+    }
+}
