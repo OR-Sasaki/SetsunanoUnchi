@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class SceneFader : SingletonMonoBehaviour<SceneFader> 
@@ -17,7 +18,10 @@ public class SceneFader : SingletonMonoBehaviour<SceneFader>
     private State _state = State.Idle;
     [SerializeField] private Image _image;
     [SerializeField] private float _fadeSpeed = 0.05f;
+    private UnityAction _callback;
 
+    public bool IsFading => _state == State.FadeIn || _state == State.FadeOut;
+    
     private void Update()
     {
         var color = _image.color;
@@ -26,18 +30,20 @@ public class SceneFader : SingletonMonoBehaviour<SceneFader>
         {
             case State.FadeIn:
                 color.a += _fadeSpeed;
-                if (color.a <= 0)
-                {
-                    color.a = 0;
-                    _state = State.Idle;
-                }
-                break;
-            case State.FadeOut:
-                color.a -= _fadeSpeed;
                 if (color.a >= 1)
                 {
                     color.a = 1;
                     _state = State.Idle;
+                    _callback?.Invoke();
+                }
+                break;
+            case State.FadeOut:
+                color.a -= _fadeSpeed;
+                if (color.a <= 0)
+                {
+                    color.a = 0;
+                    _state = State.Idle;
+                    _callback?.Invoke();
                 }
                 break;
         }
@@ -45,20 +51,22 @@ public class SceneFader : SingletonMonoBehaviour<SceneFader>
         _image.color = color;
     }
 
-    public void FadeOut()
+    public void FadeOut(UnityAction callback = null)
     {
+        _callback = callback;
         _state = State.FadeOut;
     }
 
-    public void FadeIn()
+    public void FadeIn(UnityAction callback = null)
     {
+        _callback = callback;
         _state = State.FadeIn;
     }
 
-    public void SetOnOff(bool flag)
+    public void SetOnOff(bool isOn)
     {
         var color = _image.color;
-        color.a = flag ? 1 : 0;
+        color.a = isOn ? 1 : 0;
         _image.color = color;
     }
 }

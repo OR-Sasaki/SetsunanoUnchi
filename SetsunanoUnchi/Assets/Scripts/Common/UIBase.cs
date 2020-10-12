@@ -1,4 +1,6 @@
-﻿public abstract class UIBase
+﻿using UnityEngine;
+
+public abstract class UIBase : MonoBehaviour
 {
     public virtual void OnUIEvent(UIBase ui, string message) { }
 
